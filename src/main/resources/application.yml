@@ -1,0 +1,28 @@
+spring:
+    application:
+        name: project
+    datasource:
+        url: jdbc:mysql://localhost:3306/test
+        username: root
+        password: 1234
+        driver-class-name: com.mysql.cj.jdbc.Driver
+    jpa:
+        hibernate:
+            ddl-auto: update
+        show-sql: true
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+server:
+    port: 8090
+
+
+jwt:
+  expiration:
+    access-token: 3600 # 1 hour
+    refresh-token: 604800 # 7 days
+  secret:
+    key: keytest111111111111111111111111111111111111111111111111kety
