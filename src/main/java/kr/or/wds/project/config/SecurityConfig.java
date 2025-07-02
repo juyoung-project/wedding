@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 import kr.or.wds.project.service.CustomUserDetailService;
+import kr.or.wds.project.service.Oauth2CustomService;
 import lombok.RequiredArgsConstructor;
 
 @EnableWebSecurity
@@ -23,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfig {
 
     private final CustomUserDetailService customUserDetailService;
+    private final Oauth2CustomService oAuth2UserService;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -53,9 +55,21 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/swagger-ui/**",
-                                "/api/**" //임시로 사용 중
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**",
+                                "/api/test/**",
+                                "/api/auth/**",
+                                "/oauth2/**",
+                                "/login/**"
                         ).permitAll()
-                        .anyRequest().permitAll()
+                        .anyRequest().authenticated()
+                )
+                .oauth2Login(oauth2 -> oauth2
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(oAuth2UserService)
+                        )
+                        .defaultSuccessUrl("/api/oauth/success", true)
+                        .failureUrl("/api/oauth/failure")
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
                 //.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
