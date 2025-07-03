@@ -49,4 +49,6 @@ public class LoginController {
         loginService.signup();
         return ResponseEntity.ok().build();
     }
+
+    
 }

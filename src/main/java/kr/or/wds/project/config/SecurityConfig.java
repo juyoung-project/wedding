@@ -21,6 +21,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import kr.or.wds.project.filter.JwtFilter;
+import kr.or.wds.project.handler.Oauth2SuccessHandler;
 import kr.or.wds.project.service.CustomUserDetailService;
 import kr.or.wds.project.service.Oauth2CustomService;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,7 @@ public class SecurityConfig {
     private final CustomUserDetailService customUserDetailService;
     private final JwtFilter jwtFilter;
     private final Oauth2CustomService oAuth2UserService;
+    private final Oauth2SuccessHandler oauth2SuccessHandler;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -75,7 +77,7 @@ public class SecurityConfig {
                         .userInfoEndpoint(userInfo -> userInfo
                                 .userService(oAuth2UserService)
                         )
-                        .defaultSuccessUrl("/api/oauth/success", true)
+                        .successHandler(oauth2SuccessHandler)
                         .failureUrl("/api/oauth/failure")
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
