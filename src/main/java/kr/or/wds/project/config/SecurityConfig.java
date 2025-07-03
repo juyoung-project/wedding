@@ -20,9 +20,9 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import kr.or.wds.project.common.JwtTokenProvider;
 import kr.or.wds.project.filter.JwtFilter;
 import kr.or.wds.project.service.CustomUserDetailService;
+import kr.or.wds.project.service.Oauth2CustomService;
 import lombok.RequiredArgsConstructor;
 
 @EnableWebSecurity
@@ -32,6 +32,7 @@ public class SecurityConfig {
 
     private final CustomUserDetailService customUserDetailService;
     private final JwtFilter jwtFilter;
+    private final Oauth2CustomService oAuth2UserService;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -61,9 +62,21 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/swagger-ui/**",
-                                "/api/**" //임시로 사용 중
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**",
+                                "/api/test/**",
+                                "/api/auth/**",
+                                "/oauth2/**",
+                                "/login/**"
                         ).permitAll()
-                        .anyRequest().permitAll()
+                        .anyRequest().authenticated()
+                )
+                .oauth2Login(oauth2 -> oauth2
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(oAuth2UserService)
+                        )
+                        .defaultSuccessUrl("/api/oauth/success", true)
+                        .failureUrl("/api/oauth/failure")
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
